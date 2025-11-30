@@ -30,7 +30,12 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
-fs = gridfs.GridFS(client[os.environ['DB_NAME']])
+
+# GridFS untuk file storage
+import pymongo
+sync_client = pymongo.MongoClient(mongo_url)
+sync_db = sync_client[os.environ['DB_NAME']]
+fs = gridfs.GridFS(sync_db)
 
 # Security
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
