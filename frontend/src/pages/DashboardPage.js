@@ -163,21 +163,22 @@ const DashboardPage = () => {
                           criteria.strength === 'moderate' ? 'bg-yellow-100 text-yellow-700' :
                           'bg-red-100 text-red-700'
                         }`}>
-                          {criteria.strength === 'strong' ? 'Kuat' : criteria.strength === 'moderate' ? 'Sedang' : 'Lemah'}
+                          {criteria.strength_label || (criteria.strength === 'strong' ? 'Memuaskan' : criteria.strength === 'moderate' ? 'Baik' : 'Kurang')}
                         </span>
                       </div>
                       <p className="text-xs text-slate-500 mt-1">
-                        {criteria.audited_clauses}/{criteria.total_clauses} klausul teraudit
+                        {criteria.audited_clauses}/{criteria.total_clauses} klausul teraudit ({criteria.achievement_percentage?.toFixed(1) || '0.0'}%)
                       </p>
                     </div>
                     <div className="text-right">
                       <div className="text-2xl font-bold" style={{ fontFamily: 'Manrope, sans-serif', color: criteria.strength === 'strong' ? '#10b981' : criteria.strength === 'moderate' ? '#f59e0b' : '#ef4444' }}>
-                        {criteria.average_score.toFixed(1)}
+                        {criteria.achievement_percentage?.toFixed(1) || '0.0'}%
                       </div>
+                      <p className="text-xs text-slate-500">Avg: {criteria.average_score?.toFixed(1) || '0.0'}</p>
                     </div>
                   </div>
                   <Progress
-                    value={criteria.average_score}
+                    value={criteria.achievement_percentage || 0}
                     className={`h-2 ${
                       criteria.strength === 'strong' ? 'bg-green-100' :
                       criteria.strength === 'moderate' ? 'bg-yellow-100' :
