@@ -532,6 +532,11 @@ async def get_dashboard(current_user: User = Depends(get_current_user)):
     results = await db.audit_results.find({}, {"_id": 0}).to_list(500)
     audited_clauses = len(results)
     
+    # Hitung persentase pencapaian SMK3 (sesuai PP 50/2012)
+    # Persentase = (Jumlah Klausul Teraudit / Total Klausul) × 100%
+    achievement_percentage = (audited_clauses / total_clauses * 100) if total_clauses > 0 else 0
+    
+    # Total score dari semua hasil audit
     total_score = sum(r['score'] for r in results)
     average_score = total_score / audited_clauses if audited_clauses > 0 else 0
     
@@ -547,6 +552,12 @@ async def get_dashboard(current_user: User = Depends(get_current_user)):
         
         criteria_results = [r for r in results if r['clause_id'] in clause_ids]
         
+        # Hitung persentase pencapaian per kriteria
+        total_criteria_clauses = len(clauses)
+        audited_criteria_clauses = len(criteria_results)
+        criteria_percentage = (audited_criteria_clauses / total_criteria_clauses * 100) if total_criteria_clauses > 0 else 0
+        
+        # Hitung average score untuk referensi
         if criteria_results:
             avg = sum(r['score'] for r in criteria_results) / len(criteria_results)
             compliant_count = sum(1 for r in criteria_results if r['status'] == "Sesuai")
@@ -554,14 +565,30 @@ async def get_dashboard(current_user: User = Depends(get_current_user)):
             avg = 0
             compliant_count = 0
         
+        # Kategori berdasarkan standar SMK3:
+        # 85-100%: Memuaskan (strong)
+        # 60-84%: Baik (moderate)
+        # 0-59%: Kurang (weak)
+        if criteria_percentage >= 85:
+            strength = "strong"
+            strength_label = "Memuaskan"
+        elif criteria_percentage >= 60:
+            strength = "moderate"
+            strength_label = "Baik"
+        else:
+            strength = "weak"
+            strength_label = "Kurang"
+        
         criteria_scores.append({
             "id": criteria['id'],
             "name": criteria['name'],
             "average_score": round(avg, 2),
-            "total_clauses": len(clauses),
-            "audited_clauses": len(criteria_results),
+            "achievement_percentage": round(criteria_percentage, 2),
+            "total_clauses": total_criteria_clauses,
+            "audited_clauses": audited_criteria_clauses,
             "compliant_clauses": compliant_count,
-            "strength": "strong" if avg >= 80 else "moderate" if avg >= 60 else "weak"
+            "strength": strength,
+            "strength_label": strength_label
         })
     
     return DashboardStats(
