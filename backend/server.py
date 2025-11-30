@@ -795,30 +795,28 @@ async def seed_initial_data(current_user: User = Depends(get_current_user)):
     
     existing_criteria = await db.criteria.count_documents({})
     if existing_criteria > 0:
-        return {"message": "Data already seeded"}
+        return {"message": "Data already seeded", "criteria_count": existing_criteria, "clauses_count": await db.clauses.count_documents({})}
     
-    criteria_data = [
-        {"name": "Pembangunan dan Pemeliharaan Komitmen", "description": "Komitmen manajemen terhadap K3", "order": 1},
-        {"name": "Pembuatan dan Pendokumentasian Rencana K3", "description": "Perencanaan dan dokumentasi K3", "order": 2},
-        {"name": "Pengendalian Perancangan dan Peninjauan Kontrak", "description": "Kontrol desain dan kontrak", "order": 3},
-        {"name": "Pengendalian Dokumen", "description": "Manajemen dokumen K3", "order": 4},
-        {"name": "Pembelian dan Pengendalian Produk", "description": "Kontrol pembelian", "order": 5},
-        {"name": "Keamanan Bekerja Berdasarkan SMK3", "description": "Prosedur kerja aman", "order": 6},
-        {"name": "Standar Pemantauan", "description": "Monitoring dan pengukuran", "order": 7},
-        {"name": "Pelaporan dan Perbaikan Kekurangan", "description": "Pelaporan insiden", "order": 8},
-        {"name": "Pengelolaan Material dan Perpindahannya", "description": "Material handling", "order": 9},
-        {"name": "Pengumpulan dan Penggunaan Data", "description": "Data K3", "order": 10},
-        {"name": "Audit SMK3", "description": "Audit internal K3", "order": 11},
-        {"name": "Pengembangan Keterampilan dan Kemampuan", "description": "Pelatihan K3", "order": 12}
-    ]
+    # Run populate script
+    import subprocess
+    result = subprocess.run(
+        ["python", "populate_smk3_data.py"],
+        cwd="/app/backend",
+        capture_output=True,
+        text=True
+    )
     
-    for cd in criteria_data:
-        criteria = AuditCriteria(**cd)
-        criteria_dict = criteria.model_dump()
-        criteria_dict['created_at'] = criteria_dict['created_at'].isoformat()
-        await db.criteria.insert_one(criteria_dict)
+    if result.returncode != 0:
+        raise HTTPException(status_code=500, detail=f"Failed to seed data: {result.stderr}")
     
-    return {"message": "Initial data seeded successfully", "criteria_count": len(criteria_data)}
+    criteria_count = await db.criteria.count_documents({})
+    clauses_count = await db.clauses.count_documents({})
+    
+    return {
+        "message": "SMK3 data seeded successfully with knowledge base",
+        "criteria_count": criteria_count,
+        "clauses_count": clauses_count
+    }
 
 # ============= MAIN =============
 
