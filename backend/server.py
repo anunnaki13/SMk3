@@ -50,6 +50,11 @@ EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY", "")
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
+# Health check route
+@api_router.get("/")
+async def root():
+    return {"message": "SMK3 Audit API is running", "status": "ok"}
+
 # ============= MODELS =============
 
 class UserRole:
