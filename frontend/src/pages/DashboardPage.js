@@ -38,6 +38,18 @@ const DashboardPage = () => {
     }
   };
 
+  const handleDownloadAllEvidence = () => {
+    const downloadUrl = `${API}/audit/download-all-evidence`;
+    window.open(downloadUrl, '_blank');
+    toast.success('Mengunduh semua evidence...');
+  };
+
+  const handleDownloadCriteriaEvidence = (criteriaId, criteriaName) => {
+    const downloadUrl = `${API}/audit/download-criteria-evidence/${criteriaId}`;
+    window.open(downloadUrl, '_blank');
+    toast.success(`Mengunduh evidence ${criteriaName}...`);
+  };
+
   if (loading) {
     return (
       <Layout>
