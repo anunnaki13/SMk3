@@ -963,14 +963,19 @@ async def get_dashboard(current_user: User = Depends(get_current_user)):
             "strength_label": strength_label
         })
     
-    return DashboardStats(
-        total_clauses=total_clauses,
-        audited_clauses=audited_clauses,
-        average_score=round(average_score, 2),
-        compliant_clauses=compliant,
-        non_compliant_clauses=non_compliant,
-        criteria_scores=criteria_scores
-    )
+    return {
+        "total_clauses": total_clauses,
+        "audited_clauses": audited_clauses,
+        "auditor_assessed_clauses": auditor_assessed_count,
+        "confirm_count": confirm_count,
+        "non_confirm_major_count": non_confirm_major,
+        "non_confirm_minor_count": non_confirm_minor,
+        "achievement_percentage": round(achievement_percentage, 2),
+        "average_score": round(average_score, 2),
+        "compliant_clauses": compliant,
+        "non_compliant_clauses": non_compliant,
+        "criteria_scores": criteria_scores
+    }
 
 # ============= RECOMMENDATION ROUTES =============
 
