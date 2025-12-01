@@ -156,7 +156,9 @@ const AuditPage = () => {
         responseType: 'blob'
       });
       
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      // Create blob with proper MIME type
+      const blob = new Blob([response.data], { type: doc.mime_type || 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
       setPreviewDoc({ ...doc, previewUrl: url });
       setShowPreview(true);
     } catch (error) {
