@@ -4,7 +4,7 @@ import axios from 'axios';
 import Layout from '../components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { BarChart3, CheckCircle2, XCircle, FileCheck, TrendingUp, AlertTriangle } from 'lucide-react';
+import { BarChart3, CheckCircle2, XCircle, FileCheck, TrendingUp, AlertTriangle, Download, Archive } from 'lucide-react';
 import { toast } from 'sonner';
 
 const DashboardPage = () => {
