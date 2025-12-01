@@ -162,6 +162,49 @@ const AuditPage = () => {
 
   return (
     <Layout>
+      {/* Preview Dialog */}
+      <Dialog open={showPreview} onOpenChange={setShowPreview}>
+        <DialogContent className="max-w-4xl h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              {previewDoc?.filename}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-auto">
+            {previewDoc && (
+              <div className="w-full h-full">
+                {previewDoc.filename.toLowerCase().endsWith('.pdf') ? (
+                  <iframe
+                    src={previewDoc.previewUrl}
+                    className="w-full h-full border-0"
+                    title="Document Preview"
+                  />
+                ) : (
+                  <img
+                    src={previewDoc.previewUrl}
+                    alt={previewDoc.filename}
+                    className="max-w-full h-auto mx-auto"
+                  />
+                )}
+              </div>
+            )}
+          </div>
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={() => handleDownloadDocument(previewDoc?.id, previewDoc?.filename)}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download
+            </Button>
+            <Button variant="outline" onClick={() => setShowPreview(false)}>
+              Tutup
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <div className="space-y-6" data-testid="audit-page">
         <div>
           <h1 className="text-4xl font-bold mb-2" style={{ fontFamily: 'Manrope, sans-serif', color: '#1a1a1a' }}>Audit Dokumen</h1>
