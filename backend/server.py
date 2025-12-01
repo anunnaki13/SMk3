@@ -412,6 +412,191 @@ async def download_all_documents(clause_id: str, current_user: User = Depends(ge
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error creating ZIP file: {str(e)}")
 
+@api_router.get("/audit/download-all-evidence")
+async def download_all_evidence(current_user: User = Depends(get_current_user)):
+    """Download ALL evidence documents in structured folders (Kriteria/Klausul/files)"""
+    from bson.objectid import ObjectId
+    from fastapi.responses import StreamingResponse
+    import zipfile
+    import io
+    
+    try:
+        # Get all criteria sorted by order
+        criteria_list = await db.criteria.find({}, {"_id": 0}).sort("order", 1).to_list(100)
+        
+        if not criteria_list:
+            raise HTTPException(status_code=404, detail="No criteria found")
+        
+        # Create ZIP file in memory
+        zip_buffer = io.BytesIO()
+        total_files = 0
+        
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            for criteria in criteria_list:
+                # Get all clauses for this criteria
+                clauses = await db.clauses.find({"criteria_id": criteria['id']}, {"_id": 0}).to_list(500)
+                
+                for clause in clauses:
+                    # Get all documents for this clause
+                    docs = await db.documents.find({"clause_id": clause['id']}, {"_id": 0}).to_list(100)
+                    
+                    if docs:
+                        # Create folder structure: Kriteria_X_Name/Klausul_X.X.X_Name/
+                        criteria_folder = f"{criteria['order']:02d}_Kriteria_{criteria['name'].replace('/', '-')}"
+                        clause_folder = f"Klausul_{clause['clause_number']}_{clause['title'][:50].replace('/', '-')}"
+                        
+                        for doc in docs:
+                            try:
+                                file_data = fs.get(ObjectId(doc['file_id']))
+                                file_content = file_data.read()
+                                
+                                # Path in ZIP: Kriteria/Klausul/filename
+                                file_path = f"{criteria_folder}/{clause_folder}/{doc['filename']}"
+                                zip_file.writestr(file_path, file_content)
+                                total_files += 1
+                            except Exception as e:
+                                logging.warning(f"Failed to add {doc['filename']} to ZIP: {str(e)}")
+        
+        if total_files == 0:
+            raise HTTPException(status_code=404, detail="No evidence documents found")
+        
+        zip_buffer.seek(0)
+        
+        from datetime import datetime
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        zip_filename = f"All_Evidence_SMK3_PLTU_Tenayan_{timestamp}.zip"
+        
+        return StreamingResponse(
+            zip_buffer,
+            media_type="application/zip",
+            headers={
+                'Content-Disposition': f'attachment; filename="{zip_filename}"'
+            }
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating all evidence ZIP: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error creating ZIP file: {str(e)}")
+
+@api_router.get("/audit/download-criteria-evidence/{criteria_id}")
+async def download_criteria_evidence(criteria_id: str, current_user: User = Depends(get_current_user)):
+    """Download all evidence documents for a specific criteria"""
+    from bson.objectid import ObjectId
+    from fastapi.responses import StreamingResponse
+    import zipfile
+    import io
+    
+    try:
+        # Get criteria
+        criteria = await db.criteria.find_one({"id": criteria_id}, {"_id": 0})
+        if not criteria:
+            raise HTTPException(status_code=404, detail="Criteria not found")
+        
+        # Get all clauses for this criteria
+        clauses = await db.clauses.find({"criteria_id": criteria_id}, {"_id": 0}).to_list(500)
+        
+        if not clauses:
+            raise HTTPException(status_code=404, detail="No clauses found for this criteria")
+        
+        # Create ZIP file in memory
+        zip_buffer = io.BytesIO()
+        total_files = 0
+        
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            criteria_folder = f"{criteria['order']:02d}_Kriteria_{criteria['name'].replace('/', '-')}"
+            
+            for clause in clauses:
+                # Get all documents for this clause
+                docs = await db.documents.find({"clause_id": clause['id']}, {"_id": 0}).to_list(100)
+                
+                if docs:
+                    clause_folder = f"Klausul_{clause['clause_number']}_{clause['title'][:50].replace('/', '-')}"
+                    
+                    for doc in docs:
+                        try:
+                            file_data = fs.get(ObjectId(doc['file_id']))
+                            file_content = file_data.read()
+                            
+                            # Path in ZIP: Kriteria/Klausul/filename
+                            file_path = f"{criteria_folder}/{clause_folder}/{doc['filename']}"
+                            zip_file.writestr(file_path, file_content)
+                            total_files += 1
+                        except Exception as e:
+                            logging.warning(f"Failed to add {doc['filename']} to ZIP: {str(e)}")
+        
+        if total_files == 0:
+            raise HTTPException(status_code=404, detail="No evidence documents found for this criteria")
+        
+        zip_buffer.seek(0)
+        
+        from datetime import datetime
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        zip_filename = f"Evidence_Kriteria_{criteria['order']}_{criteria['name'].replace('/', '-')}_{timestamp}.zip"
+        
+        return StreamingResponse(
+            zip_buffer,
+            media_type="application/zip",
+            headers={
+                'Content-Disposition': f'attachment; filename="{zip_filename}"'
+            }
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating criteria evidence ZIP: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error creating ZIP file: {str(e)}")
+
+@api_router.post("/audit/hard-reset")
+async def hard_reset_audit(current_user: User = Depends(get_current_user)):
+    """Hard reset: Delete ALL documents, audit results, and recommendations"""
+    if current_user.role not in [UserRole.ADMIN]:
+        raise HTTPException(status_code=403, detail="Only admins can perform hard reset")
+    
+    from bson.objectid import ObjectId
+    
+    try:
+        # Count documents before deletion
+        docs_count = await db.documents.count_documents({})
+        results_count = await db.audit_results.count_documents({})
+        recommendations_count = await db.recommendations.count_documents({})
+        
+        # Get all documents to delete files from GridFS
+        all_docs = await db.documents.find({}, {"_id": 0, "file_id": 1}).to_list(10000)
+        
+        # Delete all files from GridFS
+        deleted_files = 0
+        for doc in all_docs:
+            try:
+                fs.delete(ObjectId(doc['file_id']))
+                deleted_files += 1
+            except Exception as e:
+                logging.warning(f"Failed to delete file {doc['file_id']} from GridFS: {str(e)}")
+        
+        # Delete all documents metadata
+        await db.documents.delete_many({})
+        
+        # Delete all audit results
+        await db.audit_results.delete_many({})
+        
+        # Delete all recommendations
+        await db.recommendations.delete_many({})
+        
+        logging.info(f"Hard reset completed by user {current_user.id}: {deleted_files} files, {docs_count} documents, {results_count} results, {recommendations_count} recommendations deleted")
+        
+        return {
+            "message": "Hard reset completed successfully",
+            "deleted": {
+                "files": deleted_files,
+                "documents": docs_count,
+                "audit_results": results_count,
+                "recommendations": recommendations_count
+            }
+        }
+    except Exception as e:
+        logging.error(f"Error during hard reset: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error during hard reset: {str(e)}")
+
 @api_router.get("/documents/{doc_id}/download")
 async def download_document(doc_id: str, current_user: User = Depends(get_current_user)):
     """Download a document file"""
