@@ -215,6 +215,37 @@ const AuditPage = () => {
     }
   };
 
+  const handleSaveAuditorAssessment = async () => {
+    if (!selectedClause || !auditResult) {
+      toast.error('Tidak ada hasil audit AI. Lakukan analisis AI terlebih dahulu.');
+      return;
+    }
+
+    if (!auditorAssessment.auditor_status) {
+      toast.error('Pilih status penilaian (Confirm/Non-Confirm)');
+      return;
+    }
+
+    if (!auditorAssessment.agreed_date) {
+      toast.error('Tentukan tanggal kesepakatan');
+      return;
+    }
+
+    setSavingAssessment(true);
+    try {
+      await axios.put(
+        `${API}/audit/results/${selectedClause.id}/auditor-assessment`,
+        auditorAssessment
+      );
+      toast.success('Penilaian auditor berhasil disimpan!');
+      fetchAuditResult(selectedClause.id);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Gagal menyimpan penilaian auditor');
+    } finally {
+      setSavingAssessment(false);
+    }
+  };
+
   const handleAnalyze = async () => {
     if (!selectedClause) return;
 
