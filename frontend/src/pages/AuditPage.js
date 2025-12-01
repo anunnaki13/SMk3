@@ -542,7 +542,10 @@ const AuditPage = () => {
                     <Card className="border-2" data-testid="audit-result-card">
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">Hasil Audit AI</CardTitle>
+                          <div>
+                            <CardTitle className="text-lg">Hasil Analisis AI (Tools Bantuan Auditor)</CardTitle>
+                            <p className="text-xs text-slate-500 mt-1">Analisis kesesuaian dokumen yang diupload dengan dokumen yang diminta</p>
+                          </div>
                           <Badge
                             variant={auditResult.status === 'Sesuai' ? 'default' : 'destructive'}
                             className={`${auditResult.status === 'Sesuai' ? 'bg-green-600' : 'bg-red-600'}`}
