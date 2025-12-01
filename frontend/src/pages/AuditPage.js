@@ -283,29 +283,66 @@ const AuditPage = () => {
 
                   {/* Documents List */}
                   {documents.length > 0 && (
-                    <div className="space-y-2">
-                      <h3 className="font-medium text-sm">Dokumen Terupload ({documents.length})</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-medium text-sm">Dokumen Terupload ({documents.length})</h3>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleDownloadAllDocuments}
+                          className="text-xs"
+                          data-testid="download-all-button"
+                        >
+                          <Archive className="w-3 h-3 mr-1" />
+                          Download Semua (ZIP)
+                        </Button>
+                      </div>
                       <div className="space-y-2">
                         {documents.map((doc) => (
-                          <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg" data-testid="document-item">
-                            <div className="flex items-center gap-3">
-                              <FileText className="w-5 h-5 text-blue-500" />
-                              <div>
-                                <p className="text-sm font-medium">{doc.filename}</p>
+                          <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors" data-testid="document-item">
+                            <div className="flex items-center gap-3 flex-1">
+                              <FileText className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate">{doc.filename}</p>
                                 <p className="text-xs text-slate-500">
                                   {(doc.size / 1024).toFixed(1)} KB • {new Date(doc.uploaded_at).toLocaleDateString('id-ID')}
                                 </p>
                               </div>
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDeleteDocument(doc.id)}
-                              className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                              data-testid="delete-document-button"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                            <div className="flex items-center gap-1 ml-2">
+                              {isPdfOrImage(doc.filename) && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handlePreviewDocument(doc)}
+                                  className="h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                                  data-testid="preview-document-button"
+                                  title="Preview"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDownloadDocument(doc.id, doc.filename)}
+                                className="h-8 w-8 text-green-500 hover:text-green-700 hover:bg-green-50"
+                                data-testid="download-document-button"
+                                title="Download"
+                              >
+                                <Download className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeleteDocument(doc.id)}
+                                className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                data-testid="delete-document-button"
+                                title="Hapus"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </div>
                         ))}
                       </div>
