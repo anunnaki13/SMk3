@@ -571,18 +571,24 @@ const AuditPage = () => {
                         </div>
 
                         <div>
-                          <h4 className="font-medium text-sm mb-2">Alasan Penilaian</h4>
+                          <h4 className="font-medium text-sm mb-2">Analisis Kesesuaian Dokumen</h4>
                           <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded">{auditResult.reasoning}</p>
                         </div>
 
                         <div>
-                          <h4 className="font-medium text-sm mb-2 text-green-700">Feedback Positif</h4>
+                          <h4 className="font-medium text-sm mb-2 text-green-700">Dokumen yang Sudah Sesuai</h4>
                           <p className="text-sm text-slate-700 bg-green-50 p-3 rounded border border-green-200">{auditResult.feedback}</p>
                         </div>
 
                         <div>
-                          <h4 className="font-medium text-sm mb-2 text-orange-700">Saran Perbaikan</h4>
+                          <h4 className="font-medium text-sm mb-2 text-orange-700">Dokumen yang Perlu Dilengkapi</h4>
                           <p className="text-sm text-slate-700 bg-orange-50 p-3 rounded border border-orange-200">{auditResult.improvement_suggestions}</p>
+                        </div>
+
+                        <div className="pt-3 border-t">
+                          <p className="text-xs text-slate-500 italic">
+                            ℹ️ Catatan: Ini adalah analisis AI sebagai tools bantuan. Keputusan akhir audit tetap di tangan auditor.
+                          </p>
                         </div>
 
                         <p className="text-xs text-slate-500 text-right">
