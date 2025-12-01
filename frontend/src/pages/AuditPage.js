@@ -26,6 +26,12 @@ const AuditPage = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [auditorAssessment, setAuditorAssessment] = useState({
+    auditor_status: '',
+    auditor_notes: '',
+    agreed_date: ''
+  });
+  const [savingAssessment, setSavingAssessment] = useState(false);
 
   useEffect(() => {
     fetchCriteria();
