@@ -1111,21 +1111,22 @@ async def generate_report(current_user: User = Depends(get_current_user)):
         story.append(Paragraph(f"Tanggal: {datetime.now(timezone.utc).strftime('%d %B %Y')}", styles['Normal']))
         story.append(Spacer(1, 0.3*inch))
         
-        dashboard = await get_dashboard(current_user)
+        dashboard_response = await get_dashboard(current_user)
+        dashboard = dashboard_response if isinstance(dashboard_response, dict) else dashboard_response.model_dump()
         
         story.append(Paragraph("Ringkasan Audit", heading_style))
         summary_data = [
             ['Metrik', 'Nilai'],
-            ['Total Klausul', str(dashboard.total_clauses)],
-            ['Klausul Teraudit', str(dashboard.audited_clauses)],
-            ['Klausul Dinilai Auditor', str(dashboard.auditor_assessed_clauses)],
+            ['Total Klausul', str(dashboard['total_clauses'])],
+            ['Klausul Teraudit', str(dashboard['audited_clauses'])],
+            ['Klausul Dinilai Auditor', str(dashboard['auditor_assessed_clauses'])],
             ['', ''],
-            ['Pencapaian Audit (Auditor)', f"{dashboard.achievement_percentage:.1f}%"],
-            ['Klausul Confirm', str(dashboard.confirm_count)],
-            ['Klausul Non-Confirm Minor', str(dashboard.non_confirm_minor_count)],
-            ['Klausul Non-Confirm Major', str(dashboard.non_confirm_major_count)],
+            ['Pencapaian Audit (Auditor)', f"{dashboard['achievement_percentage']:.1f}%"],
+            ['Klausul Confirm', str(dashboard['confirm_count'])],
+            ['Klausul Non-Confirm Minor', str(dashboard['non_confirm_minor_count'])],
+            ['Klausul Non-Confirm Major', str(dashboard['non_confirm_major_count'])],
             ['', ''],
-            ['Rata-rata Skor AI (Referensi)', f"{dashboard.average_score:.2f}"]
+            ['Rata-rata Skor AI (Referensi)', f"{dashboard['average_score']:.2f}"]
         ]
         
         summary_table = Table(summary_data, colWidths=[3*inch, 2*inch])
