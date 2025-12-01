@@ -1160,7 +1160,7 @@ async def generate_report(current_user: User = Depends(get_current_user)):
                 progress
             ])
         
-        criteria_table = Table(criteria_data, colWidths=[2.5*inch, 1.2*inch, 1*inch, 1*inch])
+        criteria_table = Table(criteria_data, colWidths=[2*inch, 1*inch, 0.8*inch, 1*inch, 0.9*inch])
         criteria_table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2ecc71')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
