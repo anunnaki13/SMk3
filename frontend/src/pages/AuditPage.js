@@ -803,12 +803,12 @@ const AuditPage = () => {
                               variant="outline" 
                               className={`${
                                 auditResult.auditor_status === 'confirm' ? 'border-green-500 text-green-700 bg-green-50' :
-                                auditResult.auditor_status === 'non_confirm_minor' ? 'border-orange-500 text-orange-700 bg-orange-50' :
+                                auditResult.auditor_status === 'non-confirm-minor' ? 'border-orange-500 text-orange-700 bg-orange-50' :
                                 'border-red-500 text-red-700 bg-red-50'
                               }`}
                             >
                               {auditResult.auditor_status === 'confirm' ? '✅ Confirm' :
-                               auditResult.auditor_status === 'non_confirm_minor' ? '⚠️ Non-Confirm Minor' :
+                               auditResult.auditor_status === 'non-confirm-minor' ? '⚠️ Non-Confirm Minor' :
                                '❌ Non-Confirm Major'}
                             </Badge>
                           </div>
