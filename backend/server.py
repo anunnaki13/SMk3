@@ -139,6 +139,17 @@ class AuditResult(BaseModel):
     improvement_suggestions: str
     audited_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     audited_by: Optional[str] = None
+    # Auditor Assessment Fields
+    auditor_status: Optional[str] = None  # "confirm", "non-confirm-major", "non-confirm-minor"
+    auditor_notes: Optional[str] = None
+    agreed_date: Optional[datetime] = None
+    auditor_assessed_at: Optional[datetime] = None
+    auditor_assessed_by: Optional[str] = None
+
+class AuditorAssessment(BaseModel):
+    auditor_status: str  # "confirm", "non-confirm-major", "non-confirm-minor"
+    auditor_notes: str
+    agreed_date: str
 
 class Recommendation(BaseModel):
     model_config = ConfigDict(extra="ignore")
