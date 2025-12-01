@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, FileText, Trash2, Play, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Upload, FileText, Trash2, Play, CheckCircle, XCircle, Loader2, Eye, Download, Archive } from 'lucide-react';
 import { toast } from 'sonner';
 
 const AuditPage = () => {
