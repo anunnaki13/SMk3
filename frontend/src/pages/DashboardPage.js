@@ -153,35 +153,93 @@ const DashboardPage = () => {
 
           <Card className="shadow-md hover:shadow-lg transition-shadow" data-testid="average-score-card">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">Skor Rata-rata</CardTitle>
-              <TrendingUp className="w-5 h-5 text-emerald-500" />
+              <CardTitle className="text-sm font-medium text-slate-600">Skor AI (Referensi)</CardTitle>
+              <TrendingUp className="w-5 h-5 text-blue-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-emerald-600" style={{ fontFamily: 'Manrope, sans-serif' }}>{stats?.average_score?.toFixed(1) || 0}</div>
-              <p className="text-xs text-slate-500 mt-1">Dari skala 0-100</p>
+              <div className="text-3xl font-bold text-blue-500" style={{ fontFamily: 'Manrope, sans-serif' }}>{stats?.average_score?.toFixed(1) || 0}</div>
+              <p className="text-xs text-slate-500 mt-1">Avg AI score (tools bantuan)</p>
             </CardContent>
           </Card>
 
-          <Card className="shadow-md hover:shadow-lg transition-shadow" data-testid="compliance-card">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">Status Kepatuhan</CardTitle>
-              <CheckCircle2 className="w-5 h-5 text-green-500" />
+          <Card className="shadow-md hover:shadow-lg transition-shadow border-2 border-emerald-200" data-testid="achievement-card">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 bg-emerald-50">
+              <CardTitle className="text-sm font-medium text-emerald-700">Pencapaian Audit</CardTitle>
+              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1">
-                  <CheckCircle2 className="w-5 h-5 text-green-500" />
-                  <span className="text-2xl font-bold text-green-600" style={{ fontFamily: 'Manrope, sans-serif' }}>{stats?.compliant_clauses || 0}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <XCircle className="w-5 h-5 text-red-500" />
-                  <span className="text-2xl font-bold text-red-600" style={{ fontFamily: 'Manrope, sans-serif' }}>{stats?.non_compliant_clauses || 0}</span>
-                </div>
+              <div className="text-3xl font-bold text-emerald-600" style={{ fontFamily: 'Manrope, sans-serif' }}>
+                {stats?.achievement_percentage?.toFixed(1) || 0}%
               </div>
-              <p className="text-xs text-slate-500 mt-2">Sesuai / Belum Sesuai</p>
+              <p className="text-xs text-slate-600 mt-1 font-medium">
+                Berbasis penilaian auditor
+              </p>
+              <p className="text-xs text-slate-500 mt-1">
+                {stats?.confirm_count || 0} dari {stats?.total_clauses || 0} klausul Confirm
+              </p>
             </CardContent>
           </Card>
         </div>
+
+        {/* Auditor Assessment Breakdown */}
+        {stats?.auditor_assessed_clauses > 0 && (
+          <Card className="shadow-md border-l-4 border-emerald-500" data-testid="auditor-assessment-breakdown">
+            <CardHeader className="bg-emerald-50">
+              <CardTitle className="text-lg text-emerald-900">Breakdown Penilaian Auditor</CardTitle>
+              <p className="text-xs text-emerald-700 mt-1">
+                {stats?.auditor_assessed_clauses} dari {stats?.total_clauses} klausul telah dinilai oleh auditor
+              </p>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 bg-green-50 border-2 border-green-200 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-green-100 rounded-full">
+                      <CheckCircle2 className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-green-700" style={{ fontFamily: 'Manrope, sans-serif' }}>
+                        {stats?.confirm_count || 0}
+                      </div>
+                      <p className="text-xs text-green-600 font-medium">Confirm</p>
+                      <p className="text-xs text-slate-500">Sesuai persyaratan</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-orange-50 border-2 border-orange-200 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-orange-100 rounded-full">
+                      <AlertTriangle className="w-6 h-6 text-orange-600" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-orange-700" style={{ fontFamily: 'Manrope, sans-serif' }}>
+                        {stats?.non_confirm_minor_count || 0}
+                      </div>
+                      <p className="text-xs text-orange-600 font-medium">Non-Confirm Minor</p>
+                      <p className="text-xs text-slate-500">Temuan kecil</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-red-50 border-2 border-red-200 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-red-100 rounded-full">
+                      <XCircle className="w-6 h-6 text-red-600" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-red-700" style={{ fontFamily: 'Manrope, sans-serif' }}>
+                        {stats?.non_confirm_major_count || 0}
+                      </div>
+                      <p className="text-xs text-red-600 font-medium">Non-Confirm Major</p>
+                      <p className="text-xs text-slate-500">Temuan serius</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Criteria Scores */}
         <Card className="shadow-md" data-testid="criteria-scores-card">
