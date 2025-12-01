@@ -839,8 +839,43 @@ async def get_audit_result(clause_id: str, current_user: User = Depends(get_curr
     
     if isinstance(result.get('audited_at'), str):
         result['audited_at'] = datetime.fromisoformat(result['audited_at'])
+    if result.get('agreed_date') and isinstance(result['agreed_date'], str):
+        result['agreed_date'] = datetime.fromisoformat(result['agreed_date'])
+    if result.get('auditor_assessed_at') and isinstance(result['auditor_assessed_at'], str):
+        result['auditor_assessed_at'] = datetime.fromisoformat(result['auditor_assessed_at'])
     
     return AuditResult(**result)
+
+@api_router.put("/audit/results/{clause_id}/auditor-assessment")
+async def update_auditor_assessment(
+    clause_id: str,
+    assessment: AuditorAssessment,
+    current_user: User = Depends(get_current_user)
+):
+    """Update auditor's assessment for a clause"""
+    if current_user.role != UserRole.AUDITOR:
+        raise HTTPException(status_code=403, detail="Only auditors can submit assessments")
+    
+    # Check if audit result exists
+    result = await db.audit_results.find_one({"clause_id": clause_id})
+    if not result:
+        raise HTTPException(status_code=404, detail="Audit result not found. Please run AI analysis first.")
+    
+    # Update with auditor assessment
+    update_data = {
+        "auditor_status": assessment.auditor_status,
+        "auditor_notes": assessment.auditor_notes,
+        "agreed_date": datetime.fromisoformat(assessment.agreed_date).isoformat(),
+        "auditor_assessed_at": datetime.now(timezone.utc).isoformat(),
+        "auditor_assessed_by": current_user.id
+    }
+    
+    await db.audit_results.update_one(
+        {"clause_id": clause_id},
+        {"$set": update_data}
+    )
+    
+    return {"message": "Auditor assessment saved successfully"}
 
 @api_router.get("/audit/dashboard", response_model=DashboardStats)
 async def get_dashboard(current_user: User = Depends(get_current_user)):
