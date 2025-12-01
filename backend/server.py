@@ -1226,6 +1226,8 @@ async def generate_report(current_user: User = Depends(get_current_user)):
         
     except Exception as e:
         logging.error(f"Error generating report: {str(e)}")
+        import traceback
+        logging.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Error generating report: {str(e)}")
 
 # ============= SEED DATA ROUTE =============
