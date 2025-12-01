@@ -65,24 +65,34 @@ const DashboardPage = () => {
   return (
     <Layout>
       <div className="space-y-6" data-testid="dashboard-page">
-        <div>
-          <h1 className="text-4xl font-bold mb-2" style={{ fontFamily: 'Manrope, sans-serif', color: '#1a1a1a' }}>Dashboard Audit SMK3</h1>
-          <p className="text-slate-600">Ringkasan status audit keselamatan dan kesehatan kerja</p>
-          <div className="mt-2 flex items-center gap-4 text-xs text-slate-500">
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-green-500"></span>
-              85-100%: Memuaskan
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
-              60-84%: Baik
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-red-500"></span>
-              0-59%: Kurang
-            </span>
-            <span className="ml-2 text-slate-400">| Standar: PP 50/2012 & Permenaker 26/2014</span>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-2" style={{ fontFamily: 'Manrope, sans-serif', color: '#1a1a1a' }}>Dashboard Audit SMK3</h1>
+            <p className="text-slate-600">Ringkasan status audit keselamatan dan kesehatan kerja</p>
+            <div className="mt-2 flex items-center gap-4 text-xs text-slate-500">
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                85-100%: Memuaskan
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
+                60-84%: Baik
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                0-59%: Kurang
+              </span>
+              <span className="ml-2 text-slate-400">| Standar: PP 50/2012 & Permenaker 26/2014</span>
+            </div>
           </div>
+          <Button
+            onClick={handleDownloadAllEvidence}
+            className="bg-blue-600 hover:bg-blue-700"
+            data-testid="download-all-evidence-button"
+          >
+            <Archive className="w-4 h-4 mr-2" />
+            Download Semua Evidence
+          </Button>
         </div>
 
         {/* Notifikasi */}
