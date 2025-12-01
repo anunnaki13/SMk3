@@ -147,6 +147,33 @@ const AuditPage = () => {
     return ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext);
   };
 
+  const handleHardReset = async () => {
+    setResetting(true);
+    try {
+      const response = await axios.post(`${API}/audit/hard-reset`);
+      const deleted = response.data.deleted;
+      
+      toast.success(
+        `Hard reset berhasil! Dihapus: ${deleted.documents} dokumen, ${deleted.audit_results} hasil audit, ${deleted.recommendations} rekomendasi`
+      );
+      
+      setShowResetDialog(false);
+      setDocuments([]);
+      setAuditResult(null);
+      setSelectedClause(null);
+      setSelectedCriteria('');
+      
+      // Refresh page after a moment
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Gagal melakukan hard reset');
+    } finally {
+      setResetting(false);
+    }
+  };
+
   const handleAnalyze = async () => {
     if (!selectedClause) return;
 
