@@ -20,6 +20,8 @@ const AuditPage = () => {
   const [auditResult, setAuditResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [previewDoc, setPreviewDoc] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     fetchCriteria();
