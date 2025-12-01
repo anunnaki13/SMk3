@@ -174,6 +174,11 @@ class RecommendationUpdate(BaseModel):
 class DashboardStats(BaseModel):
     total_clauses: int
     audited_clauses: int
+    auditor_assessed_clauses: int
+    confirm_count: int
+    non_confirm_major_count: int
+    non_confirm_minor_count: int
+    achievement_percentage: float
     average_score: float
     compliant_clauses: int
     non_compliant_clauses: int
