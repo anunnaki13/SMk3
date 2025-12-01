@@ -102,13 +102,46 @@ const AuditPage = () => {
   };
 
   const handleDeleteDocument = async (docId) => {
+    if (!window.confirm('Apakah Anda yakin ingin menghapus dokumen ini? Jika tidak ada dokumen tersisa, hasil audit akan dihapus.')) {
+      return;
+    }
+    
     try {
-      await axios.delete(`${API}/documents/${docId}`);
-      toast.success('Dokumen berhasil dihapus');
+      const response = await axios.delete(`${API}/documents/${docId}`);
+      
+      if (response.data.audit_result_deleted) {
+        toast.success('Dokumen dan hasil audit berhasil dihapus (tidak ada dokumen tersisa)');
+        setAuditResult(null);
+      } else {
+        toast.success('Dokumen berhasil dihapus');
+      }
+      
       fetchDocuments(selectedClause.id);
     } catch (error) {
       toast.error('Gagal menghapus dokumen');
     }
+  };
+
+  const handlePreviewDocument = (doc) => {
+    const previewUrl = `${API}/documents/${doc.id}/preview`;
+    setPreviewDoc({ ...doc, previewUrl });
+    setShowPreview(true);
+  };
+
+  const handleDownloadDocument = (docId, filename) => {
+    const downloadUrl = `${API}/documents/${docId}/download`;
+    window.open(downloadUrl, '_blank');
+  };
+
+  const handleDownloadAllDocuments = () => {
+    if (!selectedClause) return;
+    const downloadUrl = `${API}/clauses/${selectedClause.id}/documents/download-all`;
+    window.open(downloadUrl, '_blank');
+  };
+
+  const isPdfOrImage = (filename) => {
+    const ext = filename.split('.').pop().toLowerCase();
+    return ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext);
   };
 
   const handleAnalyze = async () => {
