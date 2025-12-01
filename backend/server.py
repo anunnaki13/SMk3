@@ -884,11 +884,19 @@ async def get_dashboard(current_user: User = Depends(get_current_user)):
     results = await db.audit_results.find({}, {"_id": 0}).to_list(500)
     audited_clauses = len(results)
     
-    # Hitung persentase pencapaian SMK3 (sesuai PP 50/2012)
-    # Persentase = (Jumlah Klausul Teraudit / Total Klausul) × 100%
-    achievement_percentage = (audited_clauses / total_clauses * 100) if total_clauses > 0 else 0
+    # Hitung berdasarkan auditor assessment (jika ada)
+    # Confirm = 1, Non-confirm = 0
+    results_with_auditor = [r for r in results if r.get('auditor_status')]
+    auditor_assessed_count = len(results_with_auditor)
     
-    # Total score dari semua hasil audit
+    confirm_count = sum(1 for r in results_with_auditor if r.get('auditor_status') == 'confirm')
+    non_confirm_major = sum(1 for r in results_with_auditor if r.get('auditor_status') == 'non-confirm-major')
+    non_confirm_minor = sum(1 for r in results_with_auditor if r.get('auditor_status') == 'non-confirm-minor')
+    
+    # Skor berdasarkan confirm/non-confirm: (confirm / total) * 100
+    achievement_percentage = (confirm_count / total_clauses * 100) if total_clauses > 0 else 0
+    
+    # Total score dari semua hasil audit (AI score untuk referensi)
     total_score = sum(r['score'] for r in results)
     average_score = total_score / audited_clauses if audited_clauses > 0 else 0
     
