@@ -369,6 +369,49 @@ async def get_documents(clause_id: str, current_user: User = Depends(get_current
     
     return docs
 
+@api_router.get("/clauses/{clause_id}/documents/download-all")
+async def download_all_documents(clause_id: str, current_user: User = Depends(get_current_user)):
+    """Download all documents for a clause as ZIP file"""
+    clause = await db.clauses.find_one({"id": clause_id})
+    if not clause:
+        raise HTTPException(status_code=404, detail="Clause not found")
+    
+    docs = await db.documents.find({"clause_id": clause_id}, {"_id": 0}).to_list(100)
+    
+    if not docs:
+        raise HTTPException(status_code=404, detail="No documents found for this clause")
+    
+    from bson.objectid import ObjectId
+    from fastapi.responses import StreamingResponse
+    import zipfile
+    import io
+    
+    try:
+        # Create ZIP file in memory
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            for doc in docs:
+                try:
+                    file_data = fs.get(ObjectId(doc['file_id']))
+                    file_content = file_data.read()
+                    zip_file.writestr(doc['filename'], file_content)
+                except Exception as e:
+                    logging.warning(f"Failed to add {doc['filename']} to ZIP: {str(e)}")
+        
+        zip_buffer.seek(0)
+        
+        zip_filename = f"Klausul_{clause['clause_number']}_Documents.zip"
+        
+        return StreamingResponse(
+            zip_buffer,
+            media_type="application/zip",
+            headers={
+                'Content-Disposition': f'attachment; filename="{zip_filename}"'
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating ZIP file: {str(e)}")
+
 @api_router.get("/documents/{doc_id}/download")
 async def download_document(doc_id: str, current_user: User = Depends(get_current_user)):
     """Download a document file"""
