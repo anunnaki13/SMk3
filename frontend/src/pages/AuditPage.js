@@ -13,7 +13,7 @@ import { Upload, FileText, Trash2, Play, CheckCircle, XCircle, Loader2, Eye, Dow
 import { toast } from 'sonner';
 
 const AuditPage = () => {
-  const { API } = useContext(AppContext);
+  const { API, user } = useContext(AppContext);
   const [criteria, setCriteria] = useState([]);
   const [clauses, setClauses] = useState([]);
   const [selectedCriteria, setSelectedCriteria] = useState('');
