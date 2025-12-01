@@ -676,6 +676,146 @@ const AuditPage = () => {
                       </CardContent>
                     </Card>
                   )}
+
+                  {/* Auditor Assessment Form */}
+                  {auditResult && user?.role === 'auditor' && (
+                    <Card className="border-2 border-emerald-200" data-testid="auditor-assessment-card">
+                      <CardHeader className="pb-3 bg-emerald-50">
+                        <CardTitle className="text-lg text-emerald-900">Penilaian Auditor (Keputusan Akhir)</CardTitle>
+                        <p className="text-xs text-emerald-700 mt-1">Form penilaian final auditor terhadap klausul ini</p>
+                      </CardHeader>
+                      <CardContent className="space-y-5 pt-5">
+                        {/* Status Assessment */}
+                        <div className="space-y-3">
+                          <Label className="text-sm font-semibold text-slate-900">
+                            Status Penilaian <span className="text-red-500">*</span>
+                          </Label>
+                          <RadioGroup 
+                            value={auditorAssessment.auditor_status} 
+                            onValueChange={(value) => setAuditorAssessment(prev => ({ ...prev, auditor_status: value }))}
+                            className="space-y-2"
+                          >
+                            <div className="flex items-center space-x-3 p-3 rounded-lg border-2 border-green-200 hover:bg-green-50 transition-colors">
+                              <RadioGroupItem value="confirm" id="confirm" className="text-green-600" />
+                              <Label htmlFor="confirm" className="flex-1 cursor-pointer font-medium text-green-900">
+                                ✅ Confirm (Sesuai/Memenuhi Persyaratan)
+                              </Label>
+                            </div>
+                            <div className="flex items-center space-x-3 p-3 rounded-lg border-2 border-orange-200 hover:bg-orange-50 transition-colors">
+                              <RadioGroupItem value="non_confirm_minor" id="non_confirm_minor" className="text-orange-600" />
+                              <Label htmlFor="non_confirm_minor" className="flex-1 cursor-pointer font-medium text-orange-900">
+                                ⚠️ Non-Confirm Minor (Temuan Kecil)
+                              </Label>
+                            </div>
+                            <div className="flex items-center space-x-3 p-3 rounded-lg border-2 border-red-200 hover:bg-red-50 transition-colors">
+                              <RadioGroupItem value="non_confirm_major" id="non_confirm_major" className="text-red-600" />
+                              <Label htmlFor="non_confirm_major" className="flex-1 cursor-pointer font-medium text-red-900">
+                                ❌ Non-Confirm Major (Temuan Besar/Serius)
+                              </Label>
+                            </div>
+                          </RadioGroup>
+                        </div>
+
+                        {/* Notes */}
+                        <div className="space-y-2">
+                          <Label htmlFor="auditor_notes" className="text-sm font-semibold text-slate-900">
+                            Catatan & Rekomendasi Auditor
+                          </Label>
+                          <Textarea
+                            id="auditor_notes"
+                            value={auditorAssessment.auditor_notes}
+                            onChange={(e) => setAuditorAssessment(prev => ({ ...prev, auditor_notes: e.target.value }))}
+                            placeholder="Masukkan catatan temuan, rekomendasi perbaikan, atau hal-hal yang perlu ditindaklanjuti..."
+                            className="min-h-[100px] resize-y"
+                            data-testid="auditor-notes-textarea"
+                          />
+                        </div>
+
+                        {/* Due Date */}
+                        <div className="space-y-2">
+                          <Label className="text-sm font-semibold text-slate-900">
+                            Tanggal Kesepakatan Penyelesaian <span className="text-red-500">*</span>
+                          </Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className="w-full justify-start text-left font-normal"
+                                data-testid="date-picker-button"
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {auditorAssessment.agreed_date ? (
+                                  format(new Date(auditorAssessment.agreed_date), 'PPP', { locale: idLocale })
+                                ) : (
+                                  <span className="text-slate-500">Pilih tanggal...</span>
+                                )}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={auditorAssessment.agreed_date ? new Date(auditorAssessment.agreed_date) : undefined}
+                                onSelect={(date) => {
+                                  if (date) {
+                                    setAuditorAssessment(prev => ({ 
+                                      ...prev, 
+                                      agreed_date: date.toISOString().split('T')[0] 
+                                    }));
+                                  }
+                                }}
+                                initialFocus
+                                locale={idLocale}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <p className="text-xs text-slate-500">
+                            Tanggal kesepakatan kapan temuan/rekomendasi akan diselesaikan oleh auditee
+                          </p>
+                        </div>
+
+                        {/* Save Button */}
+                        <div className="pt-3 border-t flex justify-end">
+                          <Button
+                            onClick={handleSaveAuditorAssessment}
+                            disabled={savingAssessment}
+                            className="bg-emerald-600 hover:bg-emerald-700"
+                            data-testid="save-assessment-button"
+                          >
+                            {savingAssessment ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Menyimpan...
+                              </>
+                            ) : (
+                              <>
+                                <Save className="w-4 h-4 mr-2" />
+                                Simpan Penilaian Auditor
+                              </>
+                            )}
+                          </Button>
+                        </div>
+
+                        {/* Status Display if already assessed */}
+                        {auditResult.auditor_status && (
+                          <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                            <p className="text-xs font-semibold text-slate-700 mb-2">Status Penilaian Tersimpan:</p>
+                            <Badge 
+                              variant="outline" 
+                              className={`${
+                                auditResult.auditor_status === 'confirm' ? 'border-green-500 text-green-700 bg-green-50' :
+                                auditResult.auditor_status === 'non_confirm_minor' ? 'border-orange-500 text-orange-700 bg-orange-50' :
+                                'border-red-500 text-red-700 bg-red-50'
+                              }`}
+                            >
+                              {auditResult.auditor_status === 'confirm' ? '✅ Confirm' :
+                               auditResult.auditor_status === 'non_confirm_minor' ? '⚠️ Non-Confirm Minor' :
+                               '❌ Non-Confirm Major'}
+                            </Badge>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
                 </>
               ) : (
                 <div className="text-center py-12">
