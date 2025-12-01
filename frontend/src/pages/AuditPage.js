@@ -126,10 +126,19 @@ const AuditPage = () => {
     }
   };
 
-  const handlePreviewDocument = (doc) => {
-    const previewUrl = `${API}/documents/${doc.id}/preview`;
-    setPreviewDoc({ ...doc, previewUrl });
-    setShowPreview(true);
+  const handlePreviewDocument = async (doc) => {
+    try {
+      const response = await axios.get(`${API}/documents/${doc.id}/preview`, {
+        responseType: 'blob'
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      setPreviewDoc({ ...doc, previewUrl: url });
+      setShowPreview(true);
+    } catch (error) {
+      toast.error('Gagal membuka preview dokumen');
+      console.error('Preview error:', error);
+    }
   };
 
   const handleDownloadDocument = async (docId, filename) => {
