@@ -912,10 +912,18 @@ async def get_dashboard(current_user: User = Depends(get_current_user)):
         
         criteria_results = [r for r in results if r['clause_id'] in clause_ids]
         
-        # Hitung persentase pencapaian per kriteria
+        # Filter yang sudah ada auditor assessment
+        criteria_with_auditor = [r for r in criteria_results if r.get('auditor_status')]
+        
+        # Hitung breakdown auditor assessment per criteria
+        criteria_confirm = sum(1 for r in criteria_with_auditor if r.get('auditor_status') == 'confirm')
+        criteria_nc_major = sum(1 for r in criteria_with_auditor if r.get('auditor_status') == 'non-confirm-major')
+        criteria_nc_minor = sum(1 for r in criteria_with_auditor if r.get('auditor_status') == 'non-confirm-minor')
+        
+        # Hitung persentase pencapaian per kriteria berdasarkan confirm
         total_criteria_clauses = len(clauses)
         audited_criteria_clauses = len(criteria_results)
-        criteria_percentage = (audited_criteria_clauses / total_criteria_clauses * 100) if total_criteria_clauses > 0 else 0
+        criteria_percentage = (criteria_confirm / total_criteria_clauses * 100) if total_criteria_clauses > 0 else 0
         
         # Hitung average score untuk referensi
         if criteria_results:
@@ -946,6 +954,10 @@ async def get_dashboard(current_user: User = Depends(get_current_user)):
             "achievement_percentage": round(criteria_percentage, 2),
             "total_clauses": total_criteria_clauses,
             "audited_clauses": audited_criteria_clauses,
+            "auditor_assessed_clauses": len(criteria_with_auditor),
+            "confirm_count": criteria_confirm,
+            "non_confirm_major_count": criteria_nc_major,
+            "non_confirm_minor_count": criteria_nc_minor,
             "compliant_clauses": compliant_count,
             "strength": strength,
             "strength_label": strength_label
