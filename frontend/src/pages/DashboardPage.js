@@ -274,9 +274,18 @@ const DashboardPage = () => {
                           </Button>
                         )}
                       </div>
-                      <p className="text-xs text-slate-500 mt-1">
-                        {criteria.audited_clauses}/{criteria.total_clauses} klausul teraudit ({criteria.achievement_percentage?.toFixed(1) || '0.0'}%)
-                      </p>
+                      <div className="flex items-center gap-4 mt-1">
+                        <p className="text-xs text-slate-500">
+                          {criteria.audited_clauses}/{criteria.total_clauses} klausul teraudit
+                        </p>
+                        {criteria.auditor_assessed_clauses > 0 && (
+                          <p className="text-xs text-emerald-600 font-medium">
+                            ✓ {criteria.confirm_count} Confirm • 
+                            {criteria.non_confirm_minor_count > 0 && ` ⚠ ${criteria.non_confirm_minor_count} NC Minor`}
+                            {criteria.non_confirm_major_count > 0 && ` ✗ ${criteria.non_confirm_major_count} NC Major`}
+                          </p>
+                        )}
+                      </div>
                     </div>
                     <div className="text-right">
                       <div className="text-2xl font-bold" style={{ fontFamily: 'Manrope, sans-serif', color: criteria.strength === 'strong' ? '#10b981' : criteria.strength === 'moderate' ? '#f59e0b' : '#ef4444' }}>
