@@ -369,17 +369,88 @@ async def get_documents(clause_id: str, current_user: User = Depends(get_current
     
     return docs
 
-@api_router.delete("/documents/{doc_id}")
-async def delete_document(doc_id: str, current_user: User = Depends(get_current_user)):
+@api_router.get("/documents/{doc_id}/download")
+async def download_document(doc_id: str, current_user: User = Depends(get_current_user)):
+    """Download a document file"""
     doc = await db.documents.find_one({"id": doc_id})
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
     
     from bson.objectid import ObjectId
-    fs.delete(ObjectId(doc['file_id']))
+    from fastapi.responses import StreamingResponse
+    import io
     
+    try:
+        file_data = fs.get(ObjectId(doc['file_id']))
+        file_content = file_data.read()
+        
+        return StreamingResponse(
+            io.BytesIO(file_content),
+            media_type=doc.get('mime_type', 'application/octet-stream'),
+            headers={
+                'Content-Disposition': f'attachment; filename="{doc["filename"]}"'
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error downloading document: {str(e)}")
+
+@api_router.get("/documents/{doc_id}/preview")
+async def preview_document(doc_id: str, current_user: User = Depends(get_current_user)):
+    """Preview a document file (inline display)"""
+    doc = await db.documents.find_one({"id": doc_id})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    from bson.objectid import ObjectId
+    from fastapi.responses import StreamingResponse
+    import io
+    
+    try:
+        file_data = fs.get(ObjectId(doc['file_id']))
+        file_content = file_data.read()
+        
+        return StreamingResponse(
+            io.BytesIO(file_content),
+            media_type=doc.get('mime_type', 'application/octet-stream'),
+            headers={
+                'Content-Disposition': f'inline; filename="{doc["filename"]}"'
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error previewing document: {str(e)}")
+
+@api_router.delete("/documents/{doc_id}")
+async def delete_document(doc_id: str, current_user: User = Depends(get_current_user)):
+    """Delete a document and its audit result if no documents remain"""
+    doc = await db.documents.find_one({"id": doc_id})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    clause_id = doc['clause_id']
+    
+    # Delete file from GridFS
+    from bson.objectid import ObjectId
+    try:
+        fs.delete(ObjectId(doc['file_id']))
+    except Exception as e:
+        logging.warning(f"Failed to delete file from GridFS: {str(e)}")
+    
+    # Delete document record
     await db.documents.delete_one({"id": doc_id})
-    return {"message": "Document deleted successfully"}
+    
+    # Check if there are any remaining documents for this clause
+    remaining_docs = await db.documents.count_documents({"clause_id": clause_id})
+    
+    # If no documents remain, delete the audit result
+    if remaining_docs == 0:
+        deleted_result = await db.audit_results.delete_many({"clause_id": clause_id})
+        logging.info(f"Deleted {deleted_result.deleted_count} audit results for clause {clause_id} (no documents remaining)")
+    
+    return {
+        "message": "Document deleted successfully",
+        "remaining_documents": remaining_docs,
+        "audit_result_deleted": remaining_docs == 0
+    }
 
 # ============= AUDIT ROUTES =============
 
