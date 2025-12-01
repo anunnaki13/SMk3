@@ -284,32 +284,35 @@ const AuditPage = () => {
           </DialogHeader>
           <div className="flex-1 overflow-auto bg-slate-50">
             {previewDoc && (
-              <div className="w-full h-full flex items-center justify-center">
+              <div className="w-full h-full">
                 {previewDoc.mime_type?.includes('pdf') || previewDoc.filename.toLowerCase().endsWith('.pdf') ? (
-                  <embed
-                    src={previewDoc.previewUrl}
-                    type="application/pdf"
-                    className="w-full h-full"
+                  <iframe
+                    src={`${previewDoc.previewUrl}#view=FitH`}
+                    className="w-full h-full border-0"
                     style={{ minHeight: '600px' }}
+                    title="PDF Preview"
                   />
                 ) : previewDoc.mime_type?.includes('image') || /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(previewDoc.filename) ? (
-                  <img
-                    src={previewDoc.previewUrl}
-                    alt={previewDoc.filename}
-                    className="max-w-full max-h-full object-contain"
-                  />
+                  <div className="flex items-center justify-center h-full p-4">
+                    <img
+                      src={previewDoc.previewUrl}
+                      alt={previewDoc.filename}
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  </div>
                 ) : (
-                  <div className="text-center p-8">
-                    <FileText className="w-16 h-16 mx-auto text-slate-400 mb-4" />
-                    <p className="text-slate-600 mb-2">Preview tidak tersedia untuk tipe file ini</p>
-                    <p className="text-sm text-slate-500">{previewDoc.filename}</p>
-                    <Button
-                      onClick={() => handleDownloadDocument(previewDoc.id, previewDoc.filename)}
-                      className="mt-4"
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Download File
-                    </Button>
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center p-8">
+                      <FileText className="w-16 h-16 mx-auto text-slate-400 mb-4" />
+                      <p className="text-slate-600 mb-2">Preview tidak tersedia untuk tipe file ini</p>
+                      <p className="text-sm text-slate-500 mb-4">{previewDoc.filename}</p>
+                      <Button
+                        onClick={() => handleDownloadDocument(previewDoc.id, previewDoc.filename)}
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Download File
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
