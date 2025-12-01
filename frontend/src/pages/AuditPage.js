@@ -235,10 +235,77 @@ const AuditPage = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Hard Reset Dialog */}
+      <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+              <RefreshCw className="w-5 h-5" />
+              Konfirmasi Hard Reset
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3 pt-2">
+              <p className="font-semibold text-slate-900">
+                ⚠️ PERINGATAN: Tindakan ini tidak dapat dibatalkan!
+              </p>
+              <div className="space-y-2 text-sm">
+                <p>Hard reset akan menghapus:</p>
+                <ul className="list-disc list-inside space-y-1 text-slate-700 ml-2">
+                  <li>Semua dokumen evidence yang telah diupload</li>
+                  <li>Semua hasil penilaian AI</li>
+                  <li>Semua skor dan status audit</li>
+                  <li>Semua rekomendasi auditor</li>
+                </ul>
+              </div>
+              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-xs text-yellow-800 font-medium">
+                  💾 Sangat disarankan untuk <strong>backup evidence terlebih dahulu</strong> menggunakan tombol "Download Semua Evidence" di Dashboard sebelum melanjutkan.
+                </p>
+              </div>
+              <p className="text-sm font-medium text-slate-900 pt-2">
+                Apakah Anda yakin ingin melanjutkan?
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={resetting}>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleHardReset}
+              disabled={resetting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {resetting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Menghapus...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Ya, Reset Semua
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="space-y-6" data-testid="audit-page">
-        <div>
-          <h1 className="text-4xl font-bold mb-2" style={{ fontFamily: 'Manrope, sans-serif', color: '#1a1a1a' }}>Audit Dokumen</h1>
-          <p className="text-slate-600">Upload dokumen evidence dan lakukan audit AI</p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-2" style={{ fontFamily: 'Manrope, sans-serif', color: '#1a1a1a' }}>Audit Dokumen</h1>
+            <p className="text-slate-600">Upload dokumen evidence dan lakukan audit AI</p>
+          </div>
+          {user?.role === 'admin' && (
+            <Button
+              variant="outline"
+              onClick={() => setShowResetDialog(true)}
+              className="border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700"
+              data-testid="hard-reset-button"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Hard Reset Audit
+            </Button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
