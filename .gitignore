@@ -81,3 +81,7 @@ temp/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+-e 
+# Environment files
+*.env
+*.env.*
