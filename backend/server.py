@@ -1179,8 +1179,32 @@ async def generate_report(current_user: User = Depends(get_current_user)):
             clause = await db.clauses.find_one({"id": result['clause_id']}, {"_id": 0})
             if clause:
                 story.append(Paragraph(f"<b>Klausul {clause['clause_number']}: {clause['title']}</b>", styles['Normal']))
+                
+                # Penilaian Auditor (jika ada)
+                if result.get('auditor_status'):
+                    status_text = {
+                        'confirm': '✓ Confirm (Sesuai)',
+                        'non-confirm-minor': '⚠ Non-Confirm Minor',
+                        'non-confirm-major': '✗ Non-Confirm Major'
+                    }.get(result['auditor_status'], result['auditor_status'])
+                    
+                    story.append(Paragraph(f"<b>Penilaian Auditor:</b> {status_text}", styles['Normal']))
+                    
+                    if result.get('auditor_notes'):
+                        story.append(Paragraph(f"<b>Catatan Auditor:</b> {result['auditor_notes']}", styles['Normal']))
+                    
+                    if result.get('agreed_date'):
+                        try:
+                            date_obj = datetime.fromisoformat(result['agreed_date'])
+                            date_str = date_obj.strftime('%d %B %Y')
+                        except:
+                            date_str = result['agreed_date']
+                        story.append(Paragraph(f"<b>Tanggal Kesepakatan:</b> {date_str}", styles['Normal']))
+                
+                # AI Analysis (referensi)
+                story.append(Paragraph(f"<b>Analisis AI (Referensi):</b>", styles['Normal']))
                 story.append(Paragraph(f"Status: {result['status']} | Skor: {result['score']:.2f}", styles['Normal']))
-                story.append(Paragraph(f"Alasan: {result['reasoning'][:200]}...", styles['Normal']))
+                story.append(Paragraph(f"Reasoning: {result['reasoning'][:150]}...", styles['Normal']))
                 story.append(Spacer(1, 0.2*inch))
         
         doc.build(story)
