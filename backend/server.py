@@ -1118,9 +1118,14 @@ async def generate_report(current_user: User = Depends(get_current_user)):
             ['Metrik', 'Nilai'],
             ['Total Klausul', str(dashboard.total_clauses)],
             ['Klausul Teraudit', str(dashboard.audited_clauses)],
-            ['Rata-rata Skor', f"{dashboard.average_score:.2f}"],
-            ['Klausul Sesuai', str(dashboard.compliant_clauses)],
-            ['Klausul Belum Sesuai', str(dashboard.non_compliant_clauses)]
+            ['Klausul Dinilai Auditor', str(dashboard.auditor_assessed_clauses)],
+            ['', ''],
+            ['Pencapaian Audit (Auditor)', f"{dashboard.achievement_percentage:.1f}%"],
+            ['Klausul Confirm', str(dashboard.confirm_count)],
+            ['Klausul Non-Confirm Minor', str(dashboard.non_confirm_minor_count)],
+            ['Klausul Non-Confirm Major', str(dashboard.non_confirm_major_count)],
+            ['', ''],
+            ['Rata-rata Skor AI (Referensi)', f"{dashboard.average_score:.2f}"]
         ]
         
         summary_table = Table(summary_data, colWidths=[3*inch, 2*inch])
