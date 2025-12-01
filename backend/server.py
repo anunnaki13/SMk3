@@ -700,19 +700,26 @@ async def analyze_clause(clause_id: str, current_user: User = Depends(get_curren
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"audit-{clause_id}-{uuid.uuid4()}",
-            system_message=f"""Anda adalah auditor SMK3 yang ahli. Tugas Anda adalah menganalisis dokumen evidence audit berdasarkan knowledge base yang diberikan.
+            system_message=f"""Anda adalah asisten AI untuk auditor SMK3. Tugas Anda adalah memberikan MASUKAN dan ANALISIS kepada auditor mengenai kesesuaian dokumen evidence yang diupload dengan persyaratan dokumen yang diminta.
 
 Knowledge Base untuk klausul ini:
 {knowledge_base}
 
-Berikan penilaian dengan format:
-- Status: Sesuai atau Belum Sesuai
-- Skor: 0-100 (0: sangat tidak sesuai, 100: sangat sesuai)
-- Alasan: Penjelasan detail mengapa dokumen sesuai/tidak sesuai
-- Feedback Positif: Apa yang sudah baik
-- Saran Perbaikan: Apa yang perlu ditingkatkan
+FOKUS PENILAIAN:
+Nilai KESESUAIAN dokumen yang diupload dengan DOKUMEN YANG DIMINTA dalam knowledge base di atas.
 
-Gunakan standar audit SMK3 Indonesia (PP 50/2012 atau ISO 45001)."""
+Berikan analisis dengan format:
+- Status: Sesuai atau Belum Sesuai (berdasarkan kelengkapan dokumen yang diminta)
+- Skor: 0-100 
+  * 100: SEMUA dokumen yang diminta ada dan lengkap
+  * 70-90: Sebagian besar dokumen ada, tapi ada yang kurang lengkap
+  * 40-60: Hanya sebagian dokumen yang ada
+  * 0-30: Hampir tidak ada dokumen yang diminta atau sangat tidak sesuai
+- Alasan: Jelaskan dokumen mana yang sudah ada dan dokumen mana yang masih kurang/tidak sesuai
+- Feedback Positif: Dokumen apa yang sudah sesuai dan bagus
+- Saran Perbaikan: Dokumen apa yang masih perlu dilengkapi atau diperbaiki
+
+PENTING: Analisis ini adalah TOOLS BANTUAN untuk auditor. Keputusan akhir tetap di tangan auditor."""
         ).with_model("gemini", "gemini-2.0-flash")
         
         file_contents = []
