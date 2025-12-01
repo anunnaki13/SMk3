@@ -64,15 +64,23 @@ const ReportsPage = () => {
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 bg-emerald-600 rounded-full"></div>
-                  Skor per kriteria audit
+                  Pencapaian audit berbasis penilaian auditor
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 bg-emerald-600 rounded-full"></div>
-                  Detail hasil audit per klausul
+                  Breakdown Confirm/Non-Confirm per kriteria
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 bg-emerald-600 rounded-full"></div>
-                  Identifikasi kekuatan dan kelemahan
+                  Detail penilaian auditor per klausul
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-emerald-600 rounded-full"></div>
+                  Catatan & tanggal kesepakatan auditor
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-emerald-600 rounded-full"></div>
+                  Analisis AI sebagai referensi
                 </li>
               </ul>
               <Button
