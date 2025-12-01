@@ -203,6 +203,18 @@ const DashboardPage = () => {
                         }`}>
                           {criteria.strength_label || (criteria.strength === 'strong' ? 'Memuaskan' : criteria.strength === 'moderate' ? 'Baik' : 'Kurang')}
                         </span>
+                        {criteria.audited_clauses > 0 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDownloadCriteriaEvidence(criteria.id, criteria.name)}
+                            className="h-6 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            data-testid="download-criteria-evidence-button"
+                          >
+                            <Download className="w-3 h-3 mr-1" />
+                            Download
+                          </Button>
+                        )}
                       </div>
                       <p className="text-xs text-slate-500 mt-1">
                         {criteria.audited_clauses}/{criteria.total_clauses} klausul teraudit ({criteria.achievement_percentage?.toFixed(1) || '0.0'}%)
