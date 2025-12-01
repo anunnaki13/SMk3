@@ -50,6 +50,16 @@ const AuditPage = () => {
     }
   }, [selectedClause]);
 
+  useEffect(() => {
+    if (auditResult) {
+      setAuditorAssessment({
+        auditor_status: auditResult.auditor_status || '',
+        auditor_notes: auditResult.auditor_notes || '',
+        agreed_date: auditResult.agreed_date ? new Date(auditResult.agreed_date).toISOString().split('T')[0] : ''
+      });
+    }
+  }, [auditResult]);
+
   const fetchCriteria = async () => {
     try {
       const response = await axios.get(`${API}/criteria`);
