@@ -388,6 +388,48 @@ const AuditPage = () => {
                 <>
                   <p className="text-sm text-slate-600">{selectedClause.description}</p>
 
+                  {/* Knowledge Base Display for all users */}
+                  {selectedClause.knowledge_base && (
+                    <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <h4 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        Panduan Dokumen yang Diperlukan
+                      </h4>
+                      <div className="text-sm text-slate-700 space-y-2">
+                        {(() => {
+                          const kb = selectedClause.knowledge_base;
+                          
+                          // Extract deskripsi klausul
+                          const deskripsiMatch = kb.match(/DESKRIPSI KLAUSUL:([\s\S]*?)(?=DOKUMEN\/EVIDENCE|$)/i);
+                          const deskripsi = deskripsiMatch ? deskripsiMatch[1].trim() : '';
+                          
+                          // Extract dokumen yang diperlukan
+                          const dokumenMatch = kb.match(/DOKUMEN\/EVIDENCE YANG DIPERLUKAN[\s\S]*?:([\s\S]*?)(?=STANDAR PENILAIAN|$)/i);
+                          const dokumen = dokumenMatch ? dokumenMatch[1].trim() : '';
+                          
+                          return (
+                            <>
+                              {deskripsi && (
+                                <div>
+                                  <p className="font-medium text-blue-800 mb-1">Deskripsi:</p>
+                                  <p className="text-slate-700 whitespace-pre-line">{deskripsi}</p>
+                                </div>
+                              )}
+                              {dokumen && (
+                                <div className="mt-3">
+                                  <p className="font-medium text-blue-800 mb-1">Dokumen/Evidence yang Harus Diupload:</p>
+                                  <div className="text-slate-700 whitespace-pre-line bg-white p-3 rounded border border-blue-100">
+                                    {dokumen}
+                                  </div>
+                                </div>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </div>
+                  )}
+
                   {!selectedClause.knowledge_base && (
                     <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                       <p className="text-sm text-yellow-800">
