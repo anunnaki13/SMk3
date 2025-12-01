@@ -361,7 +361,7 @@ const AuditPage = () => {
                 <CardTitle>
                   {selectedClause ? `${selectedClause.clause_number}: ${selectedClause.title}` : 'Pilih klausul'}
                 </CardTitle>
-                {selectedClause && documents.length > 0 && (
+                {selectedClause && documents.length > 0 && user?.role === 'auditor' && (
                   <Button
                     onClick={handleAnalyze}
                     disabled={analyzing || !selectedClause.knowledge_base}
@@ -376,10 +376,15 @@ const AuditPage = () => {
                     ) : (
                       <>
                         <Play className="w-4 h-4 mr-2" />
-                        Analisis dengan AI
+                        Analisis dengan AI (Tools Bantuan Auditor)
                       </>
                     )}
                   </Button>
+                )}
+                {selectedClause && documents.length > 0 && user?.role !== 'auditor' && (
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+                    ℹ️ Analisis AI hanya dapat dilakukan oleh Auditor
+                  </div>
                 )}
               </div>
             </CardHeader>
