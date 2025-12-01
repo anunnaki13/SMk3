@@ -702,13 +702,13 @@ const AuditPage = () => {
                               </Label>
                             </div>
                             <div className="flex items-center space-x-3 p-3 rounded-lg border-2 border-orange-200 hover:bg-orange-50 transition-colors">
-                              <RadioGroupItem value="non_confirm_minor" id="non_confirm_minor" className="text-orange-600" />
+                              <RadioGroupItem value="non-confirm-minor" id="non_confirm_minor" className="text-orange-600" />
                               <Label htmlFor="non_confirm_minor" className="flex-1 cursor-pointer font-medium text-orange-900">
                                 ⚠️ Non-Confirm Minor (Temuan Kecil)
                               </Label>
                             </div>
                             <div className="flex items-center space-x-3 p-3 rounded-lg border-2 border-red-200 hover:bg-red-50 transition-colors">
-                              <RadioGroupItem value="non_confirm_major" id="non_confirm_major" className="text-red-600" />
+                              <RadioGroupItem value="non-confirm-major" id="non_confirm_major" className="text-red-600" />
                               <Label htmlFor="non_confirm_major" className="flex-1 cursor-pointer font-medium text-red-900">
                                 ❌ Non-Confirm Major (Temuan Besar/Serius)
                               </Label>
