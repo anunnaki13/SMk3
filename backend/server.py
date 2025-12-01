@@ -1144,14 +1144,18 @@ async def generate_report(current_user: User = Depends(get_current_user)):
         story.append(Spacer(1, 0.3*inch))
         
         story.append(Paragraph("Skor Per Kriteria", heading_style))
-        criteria_data = [['Kriteria', 'Skor Rata-rata', 'Status', 'Progress']]
+        criteria_data = [['Kriteria', 'Pencapaian', 'Confirm', 'Status', 'Progress']]
         
         for cs in dashboard.criteria_scores:
-            strength = "Kuat" if cs['strength'] == 'strong' else "Sedang" if cs['strength'] == 'moderate' else "Lemah"
+            strength = "Memuaskan" if cs['strength'] == 'strong' else "Baik" if cs['strength'] == 'moderate' else "Kurang"
             progress = f"{cs['audited_clauses']}/{cs['total_clauses']}"
+            achievement = f"{cs['achievement_percentage']:.1f}%"
+            confirm_info = f"{cs.get('confirm_count', 0)}"
+            
             criteria_data.append([
                 cs['name'],
-                f"{cs['average_score']:.2f}",
+                achievement,
+                confirm_info,
                 strength,
                 progress
             ])
