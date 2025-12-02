@@ -157,15 +157,26 @@ curl -X POST http://localhost:8001/api/seed-data \
 ### Development Mode
 
 #### Terminal 1: Jalankan Backend
+
+**Linux/Mac:**
 ```bash
 cd backend
 source venv/bin/activate  # aktifkan virtual env
 uvicorn server:app --host 0.0.0.0 --port 8001 --reload
 ```
 
+**Windows (Command Prompt):**
+```cmd
+cd backend
+venv\Scripts\activate
+uvicorn server:app --host 0.0.0.0 --port 8001 --reload
+```
+
 Backend akan berjalan di: `http://localhost:8001`
 
 #### Terminal 2: Jalankan Frontend
+
+**Linux/Mac/Windows:**
 ```bash
 cd frontend
 yarn start
