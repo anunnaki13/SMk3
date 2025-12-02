@@ -35,13 +35,28 @@ Aplikasi full-stack untuk mengelola proses audit SMK3 yang mencakup:
 - **date-fns** - Date manipulation
 - **Sonner** - Toast notifications
 
+## 💻 Supported Platforms
+
+Aplikasi ini dapat dijalankan di:
+- ✅ **Linux** (Ubuntu 20.04+, Debian 11+, CentOS 8+)
+- ✅ **Windows** (Windows 10/11, Windows Server 2019+)
+- ✅ **macOS** (dengan sedikit penyesuaian)
+
+**Panduan Instalasi:**
+- **Linux/Ubuntu**: Lihat [INSTALL.md](INSTALL.md)
+- **Windows**: Lihat [INSTALL_WINDOWS.md](INSTALL_WINDOWS.md)
+
 ## 📦 Prerequisites
 
 Sebelum instalasi, pastikan sistem Anda memiliki:
 
 1. **Python 3.11 atau lebih tinggi**
    ```bash
+   # Linux/Mac
    python3 --version
+   
+   # Windows
+   python --version
    ```
 
 2. **Node.js 18+ dan Yarn**
@@ -53,9 +68,13 @@ Sebelum instalasi, pastikan sistem Anda memiliki:
 3. **MongoDB 6.0+**
    - Install MongoDB Community Edition
    - Pastikan MongoDB service berjalan di `localhost:27017`
+   
    ```bash
-   # Cek status MongoDB
+   # Linux
    sudo systemctl status mongod
+   
+   # Windows
+   sc query MongoDB
    ```
 
 4. **Git**
