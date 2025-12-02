@@ -43,8 +43,19 @@ Aplikasi ini dapat dijalankan di:
 - ✅ **macOS** (dengan sedikit penyesuaian)
 
 **Panduan Instalasi:**
-- **Linux/Ubuntu**: Lihat [INSTALL.md](INSTALL.md)
-- **Windows**: Lihat [INSTALL_WINDOWS.md](INSTALL_WINDOWS.md)
+- **Linux/Ubuntu**: Lihat [INSTALL.md](INSTALL.md) - Lengkap dengan Nginx, Supervisor, SSL
+- **Windows**: Lihat [INSTALL_WINDOWS.md](INSTALL_WINDOWS.md) - Lengkap dengan NSSM, IIS setup
+
+**Quick Comparison:**
+
+| Fitur | Linux | Windows |
+|-------|-------|---------|
+| Instalasi | apt/yum | Download installers |
+| Virtual Env | `source venv/bin/activate` | `venv\Scripts\activate` |
+| Service Manager | Supervisor/systemd | NSSM/Windows Services |
+| Reverse Proxy | Nginx | IIS/Nginx for Windows |
+| Path Separator | `/` (forward slash) | `\` (backslash) |
+| Production Ready | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
 
 ## 📦 Prerequisites
 
